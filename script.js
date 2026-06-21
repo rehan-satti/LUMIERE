@@ -162,37 +162,44 @@ const closeCartPanel = () => {
 
 
 // ==================== LOADING SCREEN ====================
-const loader = document.getElementById('loader');
+document.addEventListener("DOMContentLoaded", () => {
+  const loader = document.getElementById("loader");
 
-const loaderShown = sessionStorage.getItem('lumiereLoaderShown');
-
-const isHomePage =
-  location.pathname.endsWith('index.html') ||
-  location.pathname === '/' ||
-  location.pathname.endsWith('/');
-
-const isReload =
-  performance.getEntriesByType('navigation')[0]?.type === 'reload';
-
-if (loader && (!isHomePage || (loaderShown && !isReload))) {
-  loader.style.display = 'none';
-}
-
-window.addEventListener('load', () => {
   if (!loader) return;
 
-  const shouldShow = isHomePage && (!loaderShown || isReload);
+  const loaderShown = sessionStorage.getItem("lumiereLoaderShown");
 
-  if (shouldShow) {
+  const isHomePage =
+    location.pathname.endsWith("index.html") ||
+    location.pathname === "/" ||
+    location.pathname.endsWith("/");
+
+  const isReload =
+    performance.getEntriesByType("navigation")[0]?.type === "reload";
+
+  // 🚨 FORCE HIDE if not home page
+  if (!isHomePage) {
+    loader.style.display = "none";
+    return;
+  }
+
+  // 🚨 If already shown before (and not reload) → hide instantly
+  if (loaderShown && !isReload) {
+    loader.style.display = "none";
+    return;
+  }
+
+  // ✅ Otherwise show loader then hide
+  window.addEventListener("load", () => {
     setTimeout(() => {
-      loader.style.opacity = '0';
+      loader.style.opacity = "0";
+
       setTimeout(() => {
-        loader.style.display = 'none';
+        loader.style.display = "none";
+        sessionStorage.setItem("lumiereLoaderShown", "true");
       }, 500);
     }, 1500);
-
-    sessionStorage.setItem('lumiereLoaderShown', 'true');
-  }
+  });
 });
 // ==================== CUSTOM CURSOR ====================
 const cursorEl = document.querySelector('.cursor');
