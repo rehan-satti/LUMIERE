@@ -159,42 +159,41 @@ const closeCartPanel = () => {
 };
 
 // ==================== LOADING SCREEN ====================
-const loader = document.getElementById('loader');
+const loader = document.getElementById("loader");
 
-const navEntries = performance.getEntriesByType('navigation');
-const isReload = navEntries.length && navEntries[0].type === 'reload';
+const nav = performance.getEntriesByType("navigation")[0];
+const isReload = nav?.type === "reload";
 
-const loaderShown = sessionStorage.getItem('lumiereLoaderShown');
+const loaderShown = sessionStorage.getItem("lumiereLoaderShown");
 
-// Better home detection (GitHub safe)
-const isHomePage =
+const isHome =
   location.pathname === "/" ||
-  location.pathname.endsWith("index.html");
+  location.pathname.includes("index.html");
 
-if (loader) {
-  // ❌ Hide instantly if not home
-  if (!isHomePage) {
-    loader.style.display = "none";
-  }
+if (!loader) return;
 
-  // ❌ Already shown (skip loader)
-  else if (loaderShown && !isReload) {
-    loader.style.display = "none";
-  }
+// ❌ not home → hide instantly
+if (!isHome) {
+  loader.style.display = "none";
+}
 
-  // ✅ Show loader only when needed
-  else {
-    window.addEventListener("load", () => {
+// ❌ already shown → skip
+else if (loaderShown && !isReload) {
+  loader.style.display = "none";
+}
+
+// ✅ show loader
+else {
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      loader.style.opacity = "0";
+
       setTimeout(() => {
-        loader.style.opacity = "0";
-
-        setTimeout(() => {
-          loader.style.display = "none";
-          sessionStorage.setItem("lumiereLoaderShown", "true");
-        }, 1000);
-      }, 3000);
-    });
-  }
+        loader.style.display = "none";
+        sessionStorage.setItem("lumiereLoaderShown", "true");
+      }, 800);
+    }, 2000); // 👈 your 2 sec delay is fine here
+  });
 }
 // ==================== CUSTOM CURSOR ====================
 const cursorEl = document.querySelector('.cursor');
