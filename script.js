@@ -163,34 +163,37 @@ const closeCartPanel = () => {
 
 // ==================== LOADING SCREEN ====================
 const loader = document.getElementById('loader');
-const loaderShown = sessionStorage.getItem('lumiereLoaderShown');
-const navEntries = performance.getEntriesByType('navigation');
-const isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
-const isHomePage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('Restaurant/'); 
 
-if (loader) {
-    // 1. Agar Home page nahi hai, toh foran hide kar dein
-    if (!isHomePage) {
-        loader.style.display = 'none';
-    } 
-    // 2. Agar loader pehle dikh chuka hai aur reload nahi hai, toh hide kar dein
-    else if (loaderShown && !isReload) {
-        loader.style.display = 'none';
-    } 
-    // 3. Agar Home page hai aur pehli baar visit ya reload hai
-    else {
-        // Loader ko set kar dein
-        sessionStorage.setItem('lumiereLoaderShown', 'true');
-        
-        // Timeout ko fixed rakhein (3 seconds + 0.8s transition)
-        setTimeout(() => {
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 800); // Transition time (0.8s) ke barabar
-        }, 3000); 
-    }
+const loaderShown = sessionStorage.getItem('lumiereLoaderShown');
+
+const isHomePage =
+  location.pathname.endsWith('index.html') ||
+  location.pathname === '/' ||
+  location.pathname.endsWith('/');
+
+const isReload =
+  performance.getEntriesByType('navigation')[0]?.type === 'reload';
+
+if (loader && (!isHomePage || (loaderShown && !isReload))) {
+  loader.style.display = 'none';
 }
+
+window.addEventListener('load', () => {
+  if (!loader) return;
+
+  const shouldShow = isHomePage && (!loaderShown || isReload);
+
+  if (shouldShow) {
+    setTimeout(() => {
+      loader.style.opacity = '0';
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 500);
+    }, 1500);
+
+    sessionStorage.setItem('lumiereLoaderShown', 'true');
+  }
+});
 // ==================== CUSTOM CURSOR ====================
 const cursorEl = document.querySelector('.cursor');
 const followerEl = document.querySelector('.cursor-follower');
